@@ -14,20 +14,6 @@ spec:
     server: 10.48.228.25    #don't change this IP address.  This references the NFS server!
   persistentVolumeReclaimPolicy: Retain
 ---
-apiVersion: v1
-kind: PersistentVolumeClaim
-metadata:
-  name: flask-pvc    
-spec:
-  accessModes:
-    - ReadWriteMany
-  resources:
-    requests:
-      storage: 1Gi
-  selector:
-    matchLabels:
-      type: nfs
----      
 apiVersion: apps/v1
 kind: Deployment
 metadata:
@@ -45,17 +31,18 @@ spec:
         app: flask
     spec:
       containers:
-        - name: flask
-          image: cithit/meltoneb:latest   #<------change this!!!!!
-          ports:
-            - containerPort: 5000
-          volumeMounts:
-            - name: nfs-storage
-              mountPath: /nfs       
+      - name: flask
+        image: cithit/meltoneb:latest
+        ports:
+        - containerPort: 5000
+        volumeMounts:
+        - name: data
+          mountPath: /data
+
       volumes:
-        - name: nfs-storage
-          persistentVolumeClaim:
-            claimName: flask-pvc    
+      - name: data
+        persistentVolumeClaim:
+          claimName: student-storage  
 ---
 apiVersion: v1
 kind: Service
